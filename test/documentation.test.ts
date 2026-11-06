@@ -33,15 +33,19 @@ describe('starter documentation contract', () => {
     expect(readme).toMatch(/never.*remote|remote.*never/i);
   });
 
-  it('states the current private-package limitation without claiming a release', async () => {
+  it('describes the published @teopeurt packages and how to authenticate, without stale pre-release claims', async () => {
     const readme = await guide('README.md');
     const overrides = await guide('docs/local-package-overrides.md');
     const text = `${readme}\n${overrides}`;
 
-    expect(text).toMatch(/0\.2\.0.*not published|not published.*0\.2\.0/i);
-    expect(text).toContain('bun install --frozen-lockfile');
-    expect(text).toMatch(/cannot run|deferred/i);
-    expect(text).not.toMatch(/released packages are available|packages have been released/i);
+    expect(readme).toMatch(/published/i);
+    expect(readme).toContain('1.1.0');
+    expect(readme).toContain('read:packages');
+    expect(readme).toContain('bun install --frozen-lockfile');
+    expect(text).not.toMatch(/not published|isn't published|not yet published|private GitHub Packages/i);
+    expect(text).not.toMatch(/cannot (currently )?complete|deferred until|clean-clone gate is deferred/i);
+    expect(text).not.toMatch(/0\.2\.0/);
+    expect(text).not.toMatch(/pre-publication/i);
   });
 
   it('keeps all guides neutral and points only to repository-owned paths', async () => {
