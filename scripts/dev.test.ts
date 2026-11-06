@@ -23,7 +23,7 @@ describe('validatePackageRegistryConfig', () => {
     expect(() => validatePackageRegistryConfig({
       npmrc: safeNpmrc.replace('@teopeurt:registry=https://npm.pkg.github.com', registry),
       environment: { NODE_AUTH_TOKEN: 'do-not-print-this' },
-    })).toThrow('exact @naakwu GitHub Packages registry');
+    })).toThrow('exact @teopeurt GitHub Packages registry');
   });
 
   it('rejects an inline registry credential', () => {

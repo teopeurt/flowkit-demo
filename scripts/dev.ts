@@ -32,7 +32,7 @@ export function validatePackageRegistryConfig(input: RegistryConfigInput): void 
 
   const registries = values('@teopeurt:registry');
   if (registries.length === 0 || registries[0] !== 'https://npm.pkg.github.com') {
-    throw new Error('.npmrc must configure the exact @naakwu GitHub Packages registry.');
+    throw new Error('.npmrc must configure the exact @teopeurt GitHub Packages registry.');
   }
   const tokens = values('//npm.pkg.github.com/:_authToken');
   if (tokens.length === 0 || tokens[0] !== '${NODE_AUTH_TOKEN}') {

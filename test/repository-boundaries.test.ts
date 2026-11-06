@@ -50,7 +50,7 @@ describe('repository boundaries', () => {
     });
   });
 
-  it('imports FlowKit only through released @naakwu package exports', async () => {
+  it('imports FlowKit only through released @teopeurt package exports', async () => {
     const violations: string[] = [];
     const sourceFiles = (await repositoryFiles('**/*.{ts,tsx,js,mjs,cjs}'));
     const importPattern = /(?:from\s+|import\s*\(|require\s*\()\s*['"]([^'"]+)['"]/g;

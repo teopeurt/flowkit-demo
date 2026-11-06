@@ -13,7 +13,7 @@ not released packages.
 Use an isolated clone or temporary copy. Keep the working starter manifest and lockfile pinned to
 `0.2.0`; do not commit `file:`, `link:`, `workspace:`, or local-registry URLs. If you have a local
 registry that serves the exact artifacts, configure only that temporary copy's `.npmrc` to point the
-`@naakwu` scope at it, then run:
+`@teopeurt` scope at it, then run:
 
 ```sh
 bun install --frozen-lockfile
