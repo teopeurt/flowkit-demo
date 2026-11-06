@@ -5,17 +5,12 @@ It is an application monorepo, not a copy of the FlowKit framework: the six fram
 consumed through their public `@teopeurt/flowkit-*` exports, while this repository owns its domain,
 database, API, workers, and browser experience.
 
-## Current package availability
+## Installing the FlowKit packages
 
-The FlowKit packages are private GitHub Packages during this phase. They require a GitHub token
-with `read:packages` and access to the package-owning repository. Version `0.2.0` is not published
-to GitHub Packages yet. Therefore a clean archive cannot currently complete
-`bun install --frozen-lockfile`, even after package authentication is configured. That clean-clone
-gate is deferred until the private `0.2.0` artifacts exist; do not describe local registry
-artifacts as released packages.
-
-When the private artifacts are available, configure the repository-root `.npmrc` without putting a
-token in the file:
+The six framework packages this application uses are published to GitHub Packages from
+[teopeurt/flowkit](https://github.com/teopeurt/flowkit) as `@teopeurt/flowkit-*` at version `1.1.0`.
+GitHub Packages asks for a token with `read:packages` to install, even for public packages, so
+configure the repository-root `.npmrc` without putting the token in the file:
 
 ```sh
 cp .npmrc.example .npmrc
@@ -23,7 +18,7 @@ export NODE_AUTH_TOKEN=your-github-packages-read-token
 bun install --frozen-lockfile
 ```
 
-`.npmrc.example` deliberately uses the exact private scope configuration:
+`.npmrc.example` contains the exact scope configuration:
 
 ```text
 @teopeurt:registry=https://npm.pkg.github.com
@@ -32,8 +27,8 @@ always-auth=true
 ```
 
 Keep `.npmrc` and `NODE_AUTH_TOKEN` private. Never commit a token or pass it as a Docker build
-argument. See [local package overrides](docs/local-package-overrides.md) for temporary local-artifact
-testing before publication.
+argument. To try an unreleased FlowKit build before it is published, see
+[local package overrides](docs/local-package-overrides.md).
 
 ## Default local development
 
