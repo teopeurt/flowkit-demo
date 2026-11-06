@@ -22,7 +22,7 @@ describe('starter documentation contract', () => {
     const readme = await guide('README.md');
 
     expect(readme).toContain('bun run dev');
-    expect(readme).toContain('@naakwu:registry=https://npm.pkg.github.com');
+    expect(readme).toContain('@teopeurt:registry=https://npm.pkg.github.com');
     expect(readme).toContain('NODE_AUTH_TOKEN');
     expect(readme).toContain('http://localhost:5173/');
     expect(readme).toContain('http://localhost:3011/health/ready');

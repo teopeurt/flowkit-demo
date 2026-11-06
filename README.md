@@ -2,7 +2,7 @@
 
 FlowKit Demo is a clone-and-customize reference application for a tenant-safe approval workflow.
 It is an application monorepo, not a copy of the FlowKit framework: the six framework packages are
-consumed through their public `@naakwu/flowkit-*` exports, while this repository owns its domain,
+consumed through their public `@teopeurt/flowkit-*` exports, while this repository owns its domain,
 database, API, workers, and browser experience.
 
 ## Current package availability
@@ -26,7 +26,7 @@ bun install --frozen-lockfile
 `.npmrc.example` deliberately uses the exact private scope configuration:
 
 ```text
-@naakwu:registry=https://npm.pkg.github.com
+@teopeurt:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 always-auth=true
 ```

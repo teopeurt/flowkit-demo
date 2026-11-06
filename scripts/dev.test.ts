@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 
 import { validatePackageRegistryConfig } from './dev';
 
-const safeNpmrc = `@naakwu:registry=https://npm.pkg.github.com
+const safeNpmrc = `@teopeurt:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=\${NODE_AUTH_TOKEN}
 always-auth=true
 `;
@@ -16,12 +16,12 @@ describe('validatePackageRegistryConfig', () => {
   });
 
   it.each([
-    '@naakwu:registry=http://127.0.0.1:4873',
-    '@naakwu:registry=https://registry.npmjs.org',
+    '@teopeurt:registry=http://127.0.0.1:4873',
+    '@teopeurt:registry=https://registry.npmjs.org',
     '@other:registry=https://npm.pkg.github.com',
   ])('rejects the wrong package registry without printing credentials', (registry) => {
     expect(() => validatePackageRegistryConfig({
-      npmrc: safeNpmrc.replace('@naakwu:registry=https://npm.pkg.github.com', registry),
+      npmrc: safeNpmrc.replace('@teopeurt:registry=https://npm.pkg.github.com', registry),
       environment: { NODE_AUTH_TOKEN: 'do-not-print-this' },
     })).toThrow('exact @naakwu GitHub Packages registry');
   });
@@ -51,10 +51,10 @@ describe('validatePackageRegistryConfig', () => {
   });
 
   it.each([
-    `${safeNpmrc}@naakwu:registry=https://registry.npmjs.org\n`,
+    `${safeNpmrc}@teopeurt:registry=https://registry.npmjs.org\n`,
     `${safeNpmrc}//npm.pkg.github.com/:_authToken=inline-secret\n`,
     `${safeNpmrc}always-auth=false\n`,
-    `${safeNpmrc}@naakwu:registry=https://npm.pkg.github.com\n`,
+    `${safeNpmrc}@teopeurt:registry=https://npm.pkg.github.com\n`,
   ])('rejects duplicate or conflicting security settings', (npmrc) => {
     expect(() => validatePackageRegistryConfig({
       npmrc,

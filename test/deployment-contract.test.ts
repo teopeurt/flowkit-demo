@@ -123,7 +123,7 @@ describe('deployment contract', () => {
       expect(lockfile).toContain('"overrides"');
     } else {
       for (const packageName of ['auth', 'consumer', 'core', 'notify', 'tasks', 'temporal']) {
-        expect(lockfile).toContain(`"@naakwu/flowkit-${packageName}": ["@naakwu/flowkit-${packageName}@0.2.0", ""`);
+        expect(lockfile).toContain(`"@teopeurt/flowkit-${packageName}": ["@teopeurt/flowkit-${packageName}@1.1.0", ""`);
       }
     }
   });
