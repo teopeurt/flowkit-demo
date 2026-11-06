@@ -13,7 +13,7 @@ not released packages.
 Use an isolated clone or temporary copy. Keep the working starter manifest and lockfile pinned to
 `0.2.0`; do not commit `file:`, `link:`, `workspace:`, or local-registry URLs. If you have a local
 registry that serves the exact artifacts, configure only that temporary copy's `.npmrc` to point the
-`@naakwu` scope at it, then run:
+`@teopeurt` scope at it, then run:
 
 ```sh
 bun install --frozen-lockfile
@@ -31,7 +31,7 @@ Discard the temporary copy or restore its `.npmrc` from `.npmrc.example`. In the
 retain:
 
 ```text
-@naakwu:registry=https://npm.pkg.github.com
+@teopeurt:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 always-auth=true
 ```
@@ -47,5 +47,5 @@ bun run build
 ```
 
 Do not modify framework source or `node_modules` to make a local override work. Preserve the
-repository's six exact `@naakwu/flowkit-*` version declarations and the boundary checks in
+repository's six exact `@teopeurt/flowkit-*` version declarations and the boundary checks in
 `test/package-contracts.preflight.test.ts` and `test/package-boundary.test.ts`.
