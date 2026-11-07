@@ -22,8 +22,7 @@ describe('starter documentation contract', () => {
     const readme = await guide('README.md');
 
     expect(readme).toContain('bun run dev');
-    expect(readme).toContain('@teopeurt:registry=https://npm.pkg.github.com');
-    expect(readme).toContain('NODE_AUTH_TOKEN');
+    expect(readme).toContain('bun install --frozen-lockfile');
     expect(readme).toContain('http://localhost:5173/');
     expect(readme).toContain('http://localhost:3011/health/ready');
     expect(readme).toContain('http://localhost:8025/');
@@ -33,19 +32,28 @@ describe('starter documentation contract', () => {
     expect(readme).toMatch(/never.*remote|remote.*never/i);
   });
 
-  it('describes the published @teopeurt packages and how to authenticate, without stale pre-release claims', async () => {
+  it('describes the public npm release and tokenless install, without stale pre-release claims', async () => {
     const readme = await guide('README.md');
     const overrides = await guide('docs/local-package-overrides.md');
-    const text = `${readme}\n${overrides}`;
+    const customizing = await guide('docs/customizing.md');
+    const text = `${readme}\n${overrides}\n${customizing}`;
 
-    expect(readme).toMatch(/published/i);
-    expect(readme).toContain('1.1.0');
-    expect(readme).toContain('read:packages');
+    expect(readme).toContain('@teopeurt/flowkit-*');
+    expect(readme).toContain('1.1.1');
+    expect(readme).toContain('npmjs.org');
     expect(readme).toContain('bun install --frozen-lockfile');
+    expect(readme).toMatch(/no token|without a token|does not require a token/i);
+    expect(readme).toMatch(/GitHub Packages/);
+    expect(readme).toMatch(/not required|optional|mirror/i);
+    expect(text).not.toContain('read:packages');
+    expect(text).not.toContain('NODE_AUTH_TOKEN');
+    expect(text).not.toContain('npm.pkg.github.com');
     expect(text).not.toMatch(/not published|isn't published|not yet published|private GitHub Packages/i);
     expect(text).not.toMatch(/cannot (currently )?complete|deferred until|clean-clone gate is deferred/i);
     expect(text).not.toMatch(/0\.2\.0/);
+    expect(text).not.toMatch(/1\.1\.0/);
     expect(text).not.toMatch(/pre-publication/i);
+    await expect(lstat(resolve(root, '.npmrc.example'))).rejects.toBeDefined();
   });
 
   it('keeps all guides neutral and points only to repository-owned paths', async () => {
