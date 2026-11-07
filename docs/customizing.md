@@ -72,7 +72,8 @@ already-running, explicitly approved disposable stack; it does not create one.
 ## Rules that do not change
 
 Do not edit `node_modules`, copy `@teopeurt/flowkit-` implementation, or import framework source.
-Use the released packages, and follow
+Install the released `@teopeurt/flowkit-*@1.1.1` packages from npmjs.org with a plain
+`bun install --frozen-lockfile`; no registry token or `.npmrc` is required. Follow
 [local-package-overrides.md](local-package-overrides.md) only to try an unreleased FlowKit build in a
 temporary copy.
 Every new data access path must carry tenant predicates, and every identity decision must come from

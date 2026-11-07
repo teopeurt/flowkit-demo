@@ -7,27 +7,17 @@ database, API, workers, and browser experience.
 
 ## Installing the FlowKit packages
 
-The six framework packages this application uses are published to GitHub Packages from
-[teopeurt/flowkit](https://github.com/teopeurt/flowkit) as `@teopeurt/flowkit-*` at version `1.1.0`.
-GitHub Packages asks for a token with `read:packages` to install, even for public packages, so
-configure the repository-root `.npmrc` without putting the token in the file:
+The six framework packages this application uses are published on
+[npmjs.org](https://www.npmjs.org/) from [teopeurt/flowkit](https://github.com/teopeurt/flowkit) as
+`@teopeurt/flowkit-*` at version `1.1.1`. Install them with a plain install; no token and no `.npmrc`
+are required:
 
 ```sh
-cp .npmrc.example .npmrc
-export NODE_AUTH_TOKEN=your-github-packages-read-token
 bun install --frozen-lockfile
 ```
 
-`.npmrc.example` contains the exact scope configuration:
-
-```text
-@teopeurt:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-always-auth=true
-```
-
-Keep `.npmrc` and `NODE_AUTH_TOKEN` private. Never commit a token or pass it as a Docker build
-argument. To try an unreleased FlowKit build before it is published, see
+The same versions are mirrored on GitHub Packages, but that registry is not required and this
+repository does not configure it. To try an unreleased FlowKit build before it is published, see
 [local package overrides](docs/local-package-overrides.md).
 
 ## Default local development
@@ -38,7 +28,7 @@ After dependencies are installed, the single development entry point is:
 bun run dev
 ```
 
-It validates Docker and the package credential configuration, starts the disposable dependency
+It validates Docker, starts the disposable dependency
 stack, validates the database identity, runs the approved local migration and seed, then starts the
 API, workflow worker, notification worker, and Vite application. It prints these local addresses:
 
