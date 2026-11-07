@@ -102,7 +102,7 @@ async function runtimeDependencyClosure(entries: readonly string[]): Promise<Set
 }
 
 describe('deployment contract', () => {
-  it('installs private packages only through an ephemeral BuildKit npmrc secret', async () => {
+  it('installs published packages from npm without registry credentials', async () => {
     const dockerfile = await text('Dockerfile');
     const lockfile = await text('bun.lock');
     const installs = dockerfile.split('\n').filter((line) => /^RUN .*bun install/.test(line));
@@ -110,20 +110,29 @@ describe('deployment contract', () => {
     expect(dockerfile).toStartWith('# syntax=docker/dockerfile:1.7');
     expect(installs.length).toBeGreaterThan(0);
     for (const install of installs) {
-      expect(install).toContain('--mount=type=secret,id=npmrc,target=/root/.npmrc,required=true');
+      expect(install).not.toContain('--mount=type=secret');
+      expect(install).toContain('bun install --frozen-lockfile');
     }
     expect(dockerfile).not.toMatch(/^(?:ARG|ENV)\s+.*(?:TOKEN|NPMRC|PASSWORD)/im);
     expect(dockerfile).not.toMatch(/^COPY\s+.*\.npmrc/im);
+    expect(dockerfile).not.toContain('NODE_AUTH_TOKEN');
+
+    const webDockerfile = await text('deploy/docker/web.Dockerfile');
+    expect(webDockerfile).not.toContain('--mount=type=secret');
+    expect(webDockerfile).toContain('bun install --frozen-lockfile');
 
     const dockerignore = await text('.dockerignore');
     expect(dockerignore.split(/\r?\n/)).toContain('.npmrc');
     expect(dockerignore.split(/\r?\n/)).toContain('.env');
     expect(lockfile).not.toContain('http://127.0.0.1:4873');
+    expect(lockfile).not.toContain('npm.pkg.github.com');
+    expect(lockfile).not.toContain('workspace:^');
+    expect(lockfile).not.toContain('@naakwu/');
     if (process.env.FLOWKIT_DEMO_CANDIDATE_TARBALLS === 'true') {
       expect(lockfile).toContain('"overrides"');
     } else {
       for (const packageName of ['auth', 'consumer', 'core', 'notify', 'tasks', 'temporal']) {
-        expect(lockfile).toContain(`"@teopeurt/flowkit-${packageName}": ["@teopeurt/flowkit-${packageName}@1.1.0", ""`);
+        expect(lockfile).toContain(`"@teopeurt/flowkit-${packageName}": ["@teopeurt/flowkit-${packageName}@1.1.1"`);
       }
     }
   });
@@ -168,16 +177,15 @@ describe('deployment contract', () => {
     const deployReadme = await text('deploy/README.md');
     expect(localCompose.name).toBe('flowkit-demo');
     expect(Object.keys(localCompose.services)).toEqual(['postgres', 'temporal', 'temporal-namespace', 'mailpit']);
-    expect(compose.secrets?.npmrc?.file).toBe('${FLOWKIT_NPMRC_PATH:-../../.npmrc}');
-    expect(deployReadme.replace(/\s+/g, ' ')).toContain(
-      'Compose defaults to the repository-root `.npmrc`; Tilt defaults to `$HOME/.npmrc`.',
-    );
+    expect(compose.secrets).toBeUndefined();
+    expect(deployReadme.replace(/\s+/g, ' ')).toContain('no registry credential');
 
     for (const [serviceName, command] of Object.entries(workloadCommands)) {
       const service = compose.services[serviceName];
-      expect(service?.build).toEqual({ context: '../..', dockerfile: 'Dockerfile', secrets: ['npmrc'] });
+      expect(service?.build).toEqual({ context: '../..', dockerfile: 'Dockerfile' });
       expect(service?.command).toEqual(Array.from(command));
     }
+    expect(compose.services.web?.build).toEqual({ context: '../..', dockerfile: 'deploy/docker/web.Dockerfile' });
     expect(compose.services.migration.environment?.FLOWKIT_DEMO_MIGRATION_APPROVED).toBe('true');
     expect(compose.services.seed.depends_on?.migration?.condition).toBe('service_completed_successfully');
     expect(compose.services.api.depends_on?.seed?.condition).toBe('service_completed_successfully');
@@ -238,25 +246,30 @@ describe('deployment contract', () => {
     for (const assignment of assignments) expect(assignment).toMatch(/^[A-Z][A-Z0-9_]*=$/);
   });
 
-  it('runs all static and disposable-stack gates in CI with package authentication', async () => {
+  it('runs all static and disposable-stack gates in CI without package credentials', async () => {
     const ci = await text('.github/workflows/ci.yml');
-    expect(ci).toContain('packages: read');
-    expect(ci).toContain('NODE_AUTH_TOKEN: ${{ secrets.FLOWKIT_PACKAGES_TOKEN || github.token }}');
+    expect(ci).not.toContain('packages: read');
+    expect(ci).not.toContain('NODE_AUTH_TOKEN');
+    expect(ci).not.toContain('npm.pkg.github.com');
+    expect(ci).not.toContain('.npmrc');
     expect(ci).toContain('bun install --frozen-lockfile');
     expect(ci).toContain('bun run typecheck');
     expect(ci).toContain('bun test');
     expect(ci).toContain('bun run build');
-    expect(ci).toContain('docker build --secret id=npmrc,src="$HOME/.npmrc" -f Dockerfile .');
+    expect(ci).toContain('docker build -f Dockerfile .');
     expect(ci).toContain('docker compose config --quiet');
     expect(ci).toContain('kubectl kustomize deploy/k8s/overlays/k3s-dev');
     expect(ci).toContain('CI=true NODE_ENV=test bun run stack:ci');
-    expect(ci).not.toMatch(/--build-arg|NODE_AUTH_TOKEN=.*docker build/);
+    expect(ci).not.toMatch(/--build-arg|--secret/);
 
     const codeql = await text('.github/workflows/codeql.yml');
+    expect(codeql).not.toContain('NODE_AUTH_TOKEN');
+    expect(codeql).not.toContain('npm.pkg.github.com');
     expect(codeql).toContain('github/codeql-action/init@v4');
     expect(codeql).toContain('github/codeql-action/analyze@v4');
 
-    const dependabot = yaml<{ updates: Array<{ 'package-ecosystem': string }> }>(await text('.github/dependabot.yml'));
+    const dependabot = yaml<{ registries?: unknown; updates: Array<{ 'package-ecosystem': string }> }>(await text('.github/dependabot.yml'));
+    expect(dependabot.registries).toBeUndefined();
     expect(dependabot.updates.map((update) => update['package-ecosystem'])).toEqual(['bun', 'github-actions', 'docker']);
   });
 
