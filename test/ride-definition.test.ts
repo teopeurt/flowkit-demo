@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { buildInitialState, lintFlow, lintInterpreterFlow, transition, validateRegistryRefs, type FlowState } from '@teopeurt/flowkit-core';
 import { publishDefinition, validateFlowkit, verifyPublishedDefinition } from '@teopeurt/flowkit-temporal';
-import { MAX_DISPATCH_ATTEMPTS, rideChannels, rideDefinition, rideGuards, ridePolicies, rideRules, rideSystemSteps, rideTemplates } from '@flowkit-demo/domain';
+import { MAX_DISPATCH_ATTEMPTS, rideChannels, rideDefinition, rideDefinitionPath, rideGuards, ridePolicies, rideRules, rideSystemSteps, rideTemplates } from '@flowkit-demo/domain';
 
 /** Interpreter boot shape: rules are pure, system steps are declared I/O refs. */
 const interpreterRegistries = { guards: rideGuards, policies: ridePolicies, rules: rideRules, systemSteps: rideSystemSteps, templates: rideTemplates, channels: rideChannels };
 
 /** Kernel shape: `steps` covers both entry-step kinds, so rules go in alongside system steps. */
 const coreRefs = { guards: rideGuards, policies: ridePolicies, steps: { ...rideSystemSteps, ...rideRules }, templates: rideTemplates, channels: rideChannels };
+
+// Hash of the ride flow as it was written with `defineFlow({...})` before moving to YAML. A change
+// here means the flow changed: bump `version` in ride.flow.yaml and update this value deliberately.
+const RIDE_DEFINITION_HASH = 'sha256:51d44913ed0293e2e21f1d453b4750ea9c1bd5be1c64eb4cff21cbe1cbc4ac2f';
 
 const rider = { id: 'rider-1', roles: ['rider'] };
 const driver = { id: 'driver-7', roles: ['driver'] };
@@ -17,6 +22,23 @@ const step = (state: FlowState, action: string, context: Parameters<typeof trans
   transition(rideDefinition, state, { action, actorId: context.actor?.id }, { subject, guards: rideGuards, policies: ridePolicies, ...context }).state;
 
 describe('ride hail definition', () => {
+  it('loads from YAML with the same hash as the original TypeScript definition', () => {
+    expect(rideDefinitionPath.endsWith('ride.flow.yaml')).toBe(true);
+    expect(publishDefinition({ definition: rideDefinition }).definitionHash).toBe(RIDE_DEFINITION_HASH);
+  });
+
+  it('keeps the CLI registries manifest in step with the code registries', () => {
+    const manifest = Bun.YAML.parse(readFileSync(rideDefinitionPath.replace(/ride\.flow\.yaml$/, 'ride.registries.yaml'), 'utf8')) as Record<string, Record<string, unknown>>;
+    const names = (section: object | undefined) => Object.keys(section ?? {}).sort();
+    expect(names(manifest.policies)).toEqual(names(ridePolicies));
+    expect(names(manifest.guards)).toEqual(names(rideGuards));
+    expect(names(manifest.systemSteps)).toEqual(names(rideSystemSteps));
+    expect(names(manifest.templates)).toEqual(names(rideTemplates));
+    expect(names(manifest.channels)).toEqual(names(rideChannels));
+    expect(Object.fromEntries(Object.entries(manifest.rules).map(([name, rule]) => [name, (rule as { actions: string[] }).actions])))
+      .toEqual(Object.fromEntries(Object.entries(rideRules).map(([name, rule]) => [name, rule.actions])));
+  });
+
   it('is strict, lint-clean, and has a stable immutable snapshot', () => {
     expect(lintFlow(rideDefinition)).toEqual([]);
     expect(lintInterpreterFlow(rideDefinition)).toEqual([]);

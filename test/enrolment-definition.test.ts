@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { buildInitialState, getDeclaredActions, lintFlow, lintInterpreterFlow, transition, validateRegistryRefs, type FlowState } from '@teopeurt/flowkit-core';
 import { publishDefinition, validateFlowkit, verifyPublishedDefinition } from '@teopeurt/flowkit-temporal';
-import { SUPERVISED_REGISTRATION_QUOTA, enrolmentChannels, enrolmentDefinition, enrolmentGuards, enrolmentPolicies, enrolmentRules, enrolmentSystemSteps, enrolmentTemplates } from '@flowkit-demo/domain';
+import { SUPERVISED_REGISTRATION_QUOTA, enrolmentChannels, enrolmentDefinition, enrolmentDefinitionPath, enrolmentGuards, enrolmentPolicies, enrolmentRules, enrolmentSystemSteps, enrolmentTemplates } from '@flowkit-demo/domain';
 
 /** Interpreter boot shape: rules are pure, system steps are declared I/O refs. */
 const interpreterRegistries = { guards: enrolmentGuards, policies: enrolmentPolicies, rules: enrolmentRules, systemSteps: enrolmentSystemSteps, templates: enrolmentTemplates, channels: enrolmentChannels };
 
 /** Kernel shape: `steps` covers both entry-step kinds, so rules go in alongside system steps. */
 const coreRefs = { guards: enrolmentGuards, policies: enrolmentPolicies, steps: { ...enrolmentSystemSteps, ...enrolmentRules }, templates: enrolmentTemplates, channels: enrolmentChannels };
+
+// Hash of the enrolment flow as it was written with `defineFlow({...})` before moving to YAML. A change
+// here means the flow changed: bump `version` in enrolment.flow.yaml and update this value deliberately.
+const ENROLMENT_DEFINITION_HASH = 'sha256:ddd7bf1cb3c76571f3bca1b48173e03c9ba708a3aac48e12cf41f7c3bc8ade23';
 
 const worker = { id: 'worker-1', roles: ['worker'] };
 const agent = { id: 'agent-3', roles: ['agent'] };
@@ -54,6 +59,23 @@ describe('worker enrolment definition', () => {
 
   it('passes interpreter boot validation', () => {
     expect(validateFlowkit({ published: publishDefinition({ definition: enrolmentDefinition }), registries: interpreterRegistries })).toEqual([]);
+  });
+
+  it('loads from YAML with the same hash as the original TypeScript definition', () => {
+    expect(enrolmentDefinitionPath.endsWith('enrolment.flow.yaml')).toBe(true);
+    expect(publishDefinition({ definition: enrolmentDefinition }).definitionHash).toBe(ENROLMENT_DEFINITION_HASH);
+  });
+
+  it('keeps the CLI registries manifest in step with the code registries', () => {
+    const manifest = Bun.YAML.parse(readFileSync(enrolmentDefinitionPath.replace(/enrolment\.flow\.yaml$/, 'enrolment.registries.yaml'), 'utf8')) as Record<string, Record<string, unknown>>;
+    const names = (section: object | undefined) => Object.keys(section ?? {}).sort();
+    expect(names(manifest.policies)).toEqual(names(enrolmentPolicies));
+    expect(names(manifest.guards)).toEqual(names(enrolmentGuards));
+    expect(names(manifest.systemSteps)).toEqual(names(enrolmentSystemSteps));
+    expect(names(manifest.templates)).toEqual(names(enrolmentTemplates));
+    expect(names(manifest.channels)).toEqual(names(enrolmentChannels));
+    expect(Object.fromEntries(Object.entries(manifest.rules).map(([name, rule]) => [name, (rule as { actions: string[] }).actions])))
+      .toEqual(Object.fromEntries(Object.entries(enrolmentRules).map(([name, rule]) => [name, rule.actions])));
   });
 
   it('starts as an unverified worker who has consented to nothing', () => {

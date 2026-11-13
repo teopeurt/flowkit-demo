@@ -103,7 +103,7 @@ describe('repository boundaries', () => {
       expect(resolvedEntries.every(([name, version]) => expectedPackages.includes(name) && version.startsWith('file:'))).toBe(true);
     } else {
       expect(Object.fromEntries(resolvedEntries)).toEqual(
-        Object.fromEntries(expectedPackages.map((name) => [name, '1.1.1'])),
+        Object.fromEntries(expectedPackages.map((name) => [name, '1.2.0'])),
       );
     }
   });

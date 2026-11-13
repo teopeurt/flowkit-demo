@@ -47,7 +47,8 @@ export const actorFromVerifiedMembership: TenantActor = {
 
 ## Replaceable seams
 
-- `packages/domain/src/leave/leave.definition.ts` is the example state machine.
+- `packages/domain/src/leave/leave.flow.yaml` is the example state machine, loaded by
+  `packages/domain/src/leave/leave.definition.ts` outside the workflow sandbox.
 - `packages/domain/src/leave/leave.registries.ts` owns example guards, policies, rules, system
   step references, templates, and channels.
 - `packages/domain/src/notifications/templates.ts` and

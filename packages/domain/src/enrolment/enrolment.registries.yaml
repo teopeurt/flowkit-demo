@@ -1,0 +1,45 @@
+# Declared names for `flowkit definitions validate --registries`. Mirrors enrolment.registries.ts;
+# test/enrolment-definition.test.ts fails if the two drift apart.
+policies:
+  workerOwnsProfile: {}
+  assistingAgent: {}
+  verificationReviewer: {}
+  verificationSupervisor: {}
+  trustSafetyReviewer: {}
+  trustSafetyAdjudicator: {}
+  trustedAutomation: {}
+guards:
+  reviewTaskClaimed: {}
+  consentCurrent: {}
+  independentRejectionChecker: {}
+  independentSuspensionChecker: {}
+  independentAppealAdjudicator: {}
+rules:
+  routeVerification: { actions: [verification_passed, verification_exception, verification_failed] }
+  routeSupervision: { actions: [require_supervised_review, activate_profile] }
+  routeErasure: { actions: [complete_erasure, retain_under_legal_hold] }
+systemSteps:
+  verifyNin: {}
+  matchLiveness: {}
+  screenDuplicateBiometric: {}
+  sealVerificationEvidence: {}
+  scoreAgentQuality: {}
+  revokeConsentTokens: {}
+  assessLegalHold: {}
+  scheduleErasure: {}
+templates:
+  konfam.consent_receipt: {}
+  konfam.verification_pending: {}
+  konfam.resubmission_requested: {}
+  konfam.profile_active: {}
+  konfam.enrolment_rejected: {}
+  konfam.commission_reversed: {}
+  konfam.integrity_flag_raised: {}
+  konfam.suspension_confirmed: {}
+  konfam.appeal_allowed: {}
+  konfam.appeal_denied: {}
+  konfam.erasure_completed: {}
+channels:
+  inbox: {}
+  sms: {}
+  whatsapp: {}

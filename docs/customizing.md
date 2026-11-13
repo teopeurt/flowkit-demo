@@ -28,10 +28,13 @@ membership; request-body organization IDs are never authoritative.
 
 ## 3. Definition and types
 
-Replace `packages/domain/src/leave/leave.definition.ts`,
-`packages/domain/src/leave/leave.types.ts`, and `packages/domain/src/leave/workflow-type.ts` with
-the new domain vocabulary. Keep the definition and its version explicit. Verify it with
-`test/definition.test.ts` and `test/workflow-type.test.ts`.
+The flow itself is YAML: replace `packages/domain/src/leave/leave.flow.yaml`, which
+`packages/domain/src/leave/leave.definition.ts` parses with `@teopeurt/flowkit-definitions`, along
+with `packages/domain/src/leave/leave.types.ts` and `packages/domain/src/leave/workflow-type.ts`.
+Keep the definition's `id` and `version` explicit, and bump `version` for any structural change.
+Keep `packages/domain/src/leave/leave.registries.yaml` in step with the registry names, then run
+`bun run definitions:validate`. Verify it with `test/definition.test.ts` and
+`test/workflow-type.test.ts`.
 
 ## 4. Registries and notifications
 
@@ -72,7 +75,7 @@ already-running, explicitly approved disposable stack; it does not create one.
 ## Rules that do not change
 
 Do not edit `node_modules`, copy `@teopeurt/flowkit-` implementation, or import framework source.
-Install the released `@teopeurt/flowkit-*@1.1.1` packages from npmjs.org with a plain
+Install the released `@teopeurt/flowkit-*@1.2.0` packages from npmjs.org with a plain
 `bun install --frozen-lockfile`; no registry token or `.npmrc` is required. Follow
 [local-package-overrides.md](local-package-overrides.md) only to try an unreleased FlowKit build in a
 temporary copy.

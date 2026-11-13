@@ -3,7 +3,8 @@
 **Status:** definition, registries, and subject schema landed and validated; runtime integration not started
 **Definition id:** `worker-enrolment-demo`, version 1
 **Owner:** flowkit-demo maintainers
-**Source:** `packages/domain/src/enrolment/`, verified by `test/enrolment-definition.test.ts`
+**Source:** `packages/domain/src/enrolment/` — the flow is authored in `enrolment.flow.yaml`; verified by
+`test/enrolment-definition.test.ts` and `bun run definitions:check`
 
 ---
 
@@ -682,6 +683,8 @@ instead of prose. Low cost, and it turns a comment into a contract.
 | Registry refs | `validateRegistryRefs` returns `[]` against the kernel shape |
 | Interpreter boot | `validateFlowkit` returns `[]` against the published snapshot |
 | Snapshot | `verifyPublishedDefinition` passes and the snapshot is frozen |
+| YAML parity | The definition loaded from `enrolment.flow.yaml` hashes to the pinned value of the original TypeScript definition |
+| Registries manifest | `enrolment.registries.yaml` names exactly the guards, policies, rules, system steps, templates and channels in `enrolment.registries.ts` |
 | Initial state | `consent_capture` / `draft` / worker, tracks `unverified` + `pending` + `none` |
 | Assisted happy path | Consent → assisted capture → pass → supervised review → `active`, commission `cleared` |
 | Self-serve exception path | Exception → resubmission → correction → pass → `active` |
@@ -734,7 +737,8 @@ policies, so a structural regression fails the test rather than surviving to rev
 
 ## 11. References
 
-- `packages/domain/src/enrolment/` — definition, registries, subject schema, workflow type
+- `packages/domain/src/enrolment/` — definition (`enrolment.flow.yaml`, loaded by `enrolment.definition.ts`),
+  registries and their CLI manifest (`enrolment.registries.yaml`), subject schema, workflow type
 - `test/enrolment-definition.test.ts` — verification described in §9
 - `docs/ride-hail-spec.md` — the second reference workflow; FK-1 is reproduced here as KF-1
 - `docs/architecture.md` — ownership boundaries and the tenant invariant

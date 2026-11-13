@@ -1,0 +1,42 @@
+# Declared names for `flowkit definitions validate --registries`. Mirrors ride.registries.ts;
+# test/ride-definition.test.ts fails if the two drift apart.
+policies:
+  riderOwnsTrip: {}
+  offeredDriver: {}
+  assignedDriver: {}
+  tripParticipant: {}
+  supportAgent: {}
+guards:
+  driverOnline: {}
+  riderOnboard: {}
+  supportTaskClaimed: {}
+rules:
+  routeQuote: { actions: [offer_quote, decline_payment] }
+  routeDispatch: { actions: [offer_ride, no_drivers_available] }
+  routeSettlement: { actions: [capture_fare, waive_fare] }
+  routeCapture: { actions: [settle_payment, retry_settlement] }
+  routeCancellationFee: { actions: [charge_cancellation_fee, waive_cancellation_fee] }
+systemSteps:
+  estimateRoute: {}
+  priceTrip: {}
+  authorizePaymentMethod: {}
+  dispatchNearestDriver: {}
+  computeFinalFare: {}
+  applyPromotions: {}
+  captureRiderPayment: {}
+  assessCancellationFee: {}
+templates:
+  ride.payment_failed: {}
+  ride.driver_offer: {}
+  ride.no_drivers: {}
+  ride.driver_assigned: {}
+  ride.driver_arriving: {}
+  ride.trip_started: {}
+  ride.incident_raised: {}
+  ride.receipt: {}
+  ride.cancellation_fee: {}
+  ride.cancelled: {}
+channels:
+  inbox: {}
+  push: {}
+  email: {}
