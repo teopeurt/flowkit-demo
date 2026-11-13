@@ -39,7 +39,7 @@ describe('starter documentation contract', () => {
     const text = `${readme}\n${overrides}\n${customizing}`;
 
     expect(readme).toContain('@teopeurt/flowkit-*');
-    expect(readme).toContain('1.1.1');
+    expect(readme).toContain('1.2.0');
     expect(readme).toContain('npmjs.org');
     expect(readme).toContain('bun install --frozen-lockfile');
     expect(readme).toMatch(/no token|without a token|does not require a token/i);

@@ -13,12 +13,12 @@
         "@temporalio/client": "1.16.2",
         "@temporalio/worker": "1.16.2",
         "@temporalio/workflow": "1.16.2",
-        "@teopeurt/flowkit-auth": "1.1.1",
-        "@teopeurt/flowkit-consumer": "1.1.1",
-        "@teopeurt/flowkit-core": "1.1.1",
-        "@teopeurt/flowkit-notify": "1.1.1",
-        "@teopeurt/flowkit-tasks": "1.1.1",
-        "@teopeurt/flowkit-temporal": "1.1.1",
+        "@teopeurt/flowkit-auth": "1.2.0",
+        "@teopeurt/flowkit-consumer": "1.2.0",
+        "@teopeurt/flowkit-core": "1.2.0",
+        "@teopeurt/flowkit-notify": "1.2.0",
+        "@teopeurt/flowkit-tasks": "1.2.0",
+        "@teopeurt/flowkit-temporal": "1.2.0",
         "better-auth": "1.3.34",
         "drizzle-orm": "^0.44.4",
         "express": "5.1.0",
@@ -433,17 +433,17 @@
 
     "@temporalio/workflow": ["@temporalio/workflow@1.16.2", "", { "dependencies": { "@temporalio/common": "1.16.2", "@temporalio/proto": "1.16.2", "nexus-rpc": "^0.0.2" } }, "sha512-EESJV9CsRSpLgebrzMY9FOMrDD1BHrXvaDB+++69eYNvH5nWNS94zfVzpPZpUoRRRLfNvSJd3jSXV/pH1HwLiQ=="],
 
-    "@teopeurt/flowkit-auth": ["@teopeurt/flowkit-auth@1.1.1", "", { "dependencies": { "zod": "^3.25.42" }, "peerDependencies": { "@nestjs/common": "^11.1.9", "@nestjs/core": "^11.1.9", "better-auth": "1.3.34", "reflect-metadata": "^0.2.0" } }, "sha512-VCZu0DThB+0YN62QocxXI6k+P19KsBbF2AFRVqP/NbuB3aPPkYgf072Ece2s66cxibn1OGwa8KTAMe0K98Rl3w=="],
+    "@teopeurt/flowkit-auth": ["@teopeurt/flowkit-auth@1.2.0", "", { "dependencies": { "zod": "^3.25.42" }, "peerDependencies": { "@nestjs/common": "^11.1.9", "@nestjs/core": "^11.1.9", "better-auth": "1.3.34", "reflect-metadata": "^0.2.0" } }, "sha512-ofSe4nSHXm2mf0qrTgmLYu3KjzujS6TAteinU3YmFT92oj/pqr2TeABXSFc7b3HCf0+lofcbpHT0b3yKEsKrRQ=="],
 
-    "@teopeurt/flowkit-consumer": ["@teopeurt/flowkit-consumer@1.1.1", "", { "dependencies": { "@teopeurt/flowkit-core": "^1.1.1", "@teopeurt/flowkit-tasks": "^1.1.1" } }, "sha512-rMDoDbnZIitiSHZ4NaHWBrHxxwK3zfy2JOQ2BBgMOmobTUmjSp+fpLLIdybAoYNMS5p3VK3lVAgydenaV/1Pvw=="],
+    "@teopeurt/flowkit-consumer": ["@teopeurt/flowkit-consumer@1.2.0", "", { "dependencies": { "@teopeurt/flowkit-core": "^1.2.0", "@teopeurt/flowkit-tasks": "^1.2.0" } }, "sha512-ijHsUjio7vOJN2RLQHoBu/NRbNRJoAONmXIdyJTLmJdkwXfzdkZtdOMxjDhnxXjKgLdpcbxbA3aRUdTEiFOZjQ=="],
 
-    "@teopeurt/flowkit-core": ["@teopeurt/flowkit-core@1.1.1", "", { "dependencies": { "zod": "^3.25.42" } }, "sha512-8toTxPEwJddSOx+X+49O/21hNBAbjX4C+RwSb4jf+3/dXZoBdCCv0OvUN0gm1xoHewH/3JYwooaotvGopnyYgw=="],
+    "@teopeurt/flowkit-core": ["@teopeurt/flowkit-core@1.2.0", "", { "dependencies": { "zod": "^3.25.42" } }, "sha512-Ml4rWScRjk0cni6D3gzp+7m44GOQ+HeMHxrHqaky6aaSXJ/F5iVUXwx4ajB444WDTE/ZQ64ZLwJeGpok7b95TQ=="],
 
-    "@teopeurt/flowkit-notify": ["@teopeurt/flowkit-notify@1.1.1", "", { "dependencies": { "@noble/hashes": "^2.0.1", "zod": "^3.25.42" } }, "sha512-qfDqAFmTLjsr6GYp1c2IHucMaYoo9wE/F4UAxw3T+zB2qg0s9Fd8mFnW6ELesgZPG71oJgRizdfZgAXy3TF8iQ=="],
+    "@teopeurt/flowkit-notify": ["@teopeurt/flowkit-notify@1.2.0", "", { "dependencies": { "@noble/hashes": "^2.0.1", "zod": "^3.25.42" } }, "sha512-YXBAH1JhGmWAHpI6igxoMADEqzmeXncMofd1RXXNuMnXTLcHuaLDq0zfPV+1P5o/JzLhn//jaVhD69hjtoEifQ=="],
 
-    "@teopeurt/flowkit-tasks": ["@teopeurt/flowkit-tasks@1.1.1", "", { "dependencies": { "@noble/hashes": "^2.0.1", "@teopeurt/flowkit-core": "^1.1.1", "zod": "^3.25.42" } }, "sha512-eWHr+BSWtsUdmNLYX8orMCVJWBR2D7g8EqUD4Fy6MLY+wVj3+PACJvX3oWL0ituNwsQby1vN+7BrYc977mmaWw=="],
+    "@teopeurt/flowkit-tasks": ["@teopeurt/flowkit-tasks@1.2.0", "", { "dependencies": { "@noble/hashes": "^2.0.1", "@teopeurt/flowkit-core": "^1.2.0", "zod": "^3.25.42" } }, "sha512-9nQWj9O6iRXlOOcMwJt5+4DpE8bsrlPVT/vWOej6ilEAWMh4I70VwYJztIji6GDTRn/cwnE2KqlVMv84pWLi0A=="],
 
-    "@teopeurt/flowkit-temporal": ["@teopeurt/flowkit-temporal@1.1.1", "", { "dependencies": { "@noble/hashes": "^2.0.1", "@temporalio/workflow": "1.16.2", "@teopeurt/flowkit-consumer": "^1.1.1", "@teopeurt/flowkit-core": "^1.1.1" } }, "sha512-Ng18RYr34Irou+BuctCWZ7Si+ZOaoqFchiwAqmIu8gnvaVPub0h8Bes79n22e15prLFmP42GFF4NEGjNidYGNw=="],
+    "@teopeurt/flowkit-temporal": ["@teopeurt/flowkit-temporal@1.2.0", "", { "dependencies": { "@noble/hashes": "^2.0.1", "@temporalio/workflow": "1.16.2", "@teopeurt/flowkit-consumer": "^1.2.0", "@teopeurt/flowkit-core": "^1.2.0" } }, "sha512-FGTeaG0BiAsJlu/t9kMli1mAGrqwujM874vEABi+v9o877qC2WM4j2APbtivBT5F/TuABP+UrR4lv5HSAiqIyQ=="],
 
     "@testing-library/dom": ["@testing-library/dom@10.4.1", "", { "dependencies": { "@babel/code-frame": "^7.10.4", "@babel/runtime": "^7.12.5", "@types/aria-query": "^5.0.1", "aria-query": "5.3.0", "dom-accessibility-api": "^0.5.9", "lz-string": "^1.5.0", "picocolors": "1.1.1", "pretty-format": "^27.0.2" } }, "sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg=="],
 
