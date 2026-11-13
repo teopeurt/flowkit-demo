@@ -9,7 +9,7 @@ database, API, workers, and browser experience.
 
 The six framework packages this application uses are published on
 [npmjs.org](https://www.npmjs.org/) from [teopeurt/flowkit](https://github.com/teopeurt/flowkit) as
-`@teopeurt/flowkit-*` at version `1.1.1`. Install them with a plain install; no token and no `.npmrc`
+`@teopeurt/flowkit-*` at version `1.2.0`. Install them with a plain install; no token and no `.npmrc`
 are required:
 
 ```sh

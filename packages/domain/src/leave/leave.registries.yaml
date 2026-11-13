@@ -1,0 +1,22 @@
+# Declared names for `flowkit definitions validate --registries`. Mirrors leave.registries.ts;
+# test/definition.test.ts fails if the two drift apart.
+policies:
+  employeeSubmit: {}
+  managerReview: {}
+guards:
+  managerTaskClaimed: {}
+rules:
+  routeLeaveRequest: { actions: [auto_approve, require_manager] }
+  completeFulfillment: { actions: [complete] }
+systemSteps:
+  loadLeavePolicyFacts: {}
+  reserveLeaveBalance: {}
+  createCalendarEntry: {}
+templates:
+  leave.accepted: {}
+  leave.rejected: {}
+  leave.manager_review: {}
+  leave.overdue: {}
+channels:
+  inbox: {}
+  email: {}

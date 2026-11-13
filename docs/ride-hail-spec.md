@@ -3,7 +3,8 @@
 **Status:** definition, registries, and subject schema landed and validated; runtime integration not started
 **Definition id:** `ride-hail-demo`, version 1
 **Owner:** flowkit-demo maintainers
-**Source:** `packages/domain/src/ride/`, verified by `test/ride-definition.test.ts`
+**Source:** `packages/domain/src/ride/` — the flow is authored in `ride.flow.yaml`; verified by
+`test/ride-definition.test.ts` and `bun run definitions:check`
 
 ---
 
@@ -542,6 +543,8 @@ are correctly registered — the failure mode is loud but the message points at 
 | Registry refs | `validateRegistryRefs` returns `[]` against the kernel shape |
 | Interpreter boot | `validateFlowkit` returns `[]` against the published snapshot |
 | Snapshot | `verifyPublishedDefinition` passes and the snapshot is frozen |
+| YAML parity | The definition loaded from `ride.flow.yaml` hashes to the pinned value of the original TypeScript definition |
+| Registries manifest | `ride.registries.yaml` names exactly the guards, policies, rules, system steps, templates and channels in `ride.registries.ts` |
 | Initial state | `trip_draft` / `draft` / rider, tracks `unassigned` + `none` |
 | Happy path | Eleven transitions to `completed` with `driver: released`, `payment: captured` |
 | Re-dispatch | `decline_timeout` returns to `driver_matching` with the authorization intact |
@@ -579,7 +582,8 @@ policies, so a structural regression fails the test rather than surviving to rev
 
 ## 11. References
 
-- `packages/domain/src/ride/` — definition, registries, subject schema, workflow type
+- `packages/domain/src/ride/` — definition (`ride.flow.yaml`, loaded by `ride.definition.ts`), registries
+  and their CLI manifest (`ride.registries.yaml`), subject schema, workflow type
 - `test/ride-definition.test.ts` — verification described in §9
 - `docs/architecture.md` — ownership boundaries and the tenant invariant
 - `docs/customizing.md` — the replacement order this module follows

@@ -14,6 +14,18 @@ let workerRun: Promise<void>;
 const transitions: RecordTransitionInput[] = [];
 const stepKeys: string[] = [];
 
+/**
+ * Settle a workflow update and return why it was rejected. Assert on the result instead of using
+ * `expect(pending).rejects`: on Bun 1.4 that waits synchronously and starves the Temporal client,
+ * so the update never settles and the test times out.
+ */
+const updateRejection = async (update: Promise<unknown>): Promise<string> => {
+  const error = await update.then(() => undefined, (rejection: unknown) => rejection);
+  if (!error) throw new Error('Expected the workflow update to be rejected, but it succeeded.');
+  const cause = (error as { cause?: { message?: string } }).cause;
+  return cause?.message ?? String((error as Error).message ?? error);
+};
+
 const actorFor = (input: ResolveActionContextInput) => {
   if (input.origin === 'signal') {
     if (input.operationId === 'trusted-signal' || input.operationId === 'reverify-entry') {
@@ -93,10 +105,23 @@ beforeAll(async () => {
   workerRun = worker.run();
 }, 30_000);
 
+/**
+ * @temporalio/worker 1.16.2 expects Bun to report a terminated workflow thread as exit code 0
+ * (`TERMINATED_EXIT_CODE = isBun ? 0 : 1`). Bun 1.4 reports 1, like Node, so a clean shutdown is
+ * misreported as a failure. Tolerate exactly that error on Bun >= 1.4; anything else still fails.
+ * CI and the Docker images pin Bun 1.3.14, where this never fires.
+ */
+const isBunThreadExitMisreport = (error: unknown) =>
+  Bun.semver.satisfies(Bun.version, '>=1.4.0')
+  && error instanceof Error
+  && error.message === 'Failed to terminate Worker thread, exit code: 1';
+
 afterAll(async () => {
   if (!worker) return;
   await worker.shutdown();
-  await workerRun;
+  await workerRun.catch((error: unknown) => {
+    if (!isBunThreadExitMisreport(error)) throw error;
+  });
   await environment.teardown();
 });
 
@@ -196,8 +221,10 @@ describe('worker enrolment FlowKit conformance', () => {
       }],
     });
 
-    await expect(handle.executeUpdate('applySignal', { updateId: 'untrusted-signal', args: [{ action: 'flag_for_fraud_review' }] })).rejects.toThrow();
-    await expect(handle.executeUpdate('applySignal', { updateId: 'cross-org-signal', args: [{ action: 'flag_for_fraud_review' }] })).rejects.toThrow();
+    expect(await updateRejection(handle.executeUpdate('applySignal', { updateId: 'untrusted-signal', args: [{ action: 'flag_for_fraud_review' }] })))
+      .toContain('Actor organization does not match the workflow subject organization');
+    expect(await updateRejection(handle.executeUpdate('applySignal', { updateId: 'cross-org-signal', args: [{ action: 'flag_for_fraud_review' }] })))
+      .toContain('Actor organization does not match the workflow subject organization');
     const review = await handle.executeUpdate('applySignal', { updateId: 'trusted-signal', args: [{ action: 'flag_for_fraud_review' }] }) as { state: { stage: string } };
     expect(review.state.stage).toBe('integrity_review');
     await handle.cancel();
@@ -216,7 +243,8 @@ describe('worker enrolment FlowKit conformance', () => {
 
     await handle.executeUpdate('applySignal', { updateId: 'trusted-signal', args: [{ action: 'flag_for_fraud_review' }] });
     await handle.executeUpdate('applyAction', { updateId: 'founder-propose', args: [{ action: 'propose_suspension', actorId: 'founder-1' }] });
-    await expect(handle.executeUpdate('applyAction', { updateId: 'founder-confirm', args: [{ action: 'confirm_suspension', actorId: 'founder-1' }] })).rejects.toThrow();
+    expect(await updateRejection(handle.executeUpdate('applyAction', { updateId: 'founder-confirm', args: [{ action: 'confirm_suspension', actorId: 'founder-1' }] })))
+      .toContain('Guard "independentSuspensionChecker" rejected action "confirm_suspension"');
     const appealWindow = await handle.executeUpdate('applyAction', { updateId: 'supervisor-confirm', args: [{ action: 'confirm_suspension', actorId: 'supervisor-2' }] }) as { state: { stage: string } };
     expect(appealWindow.state.stage).toBe('appeal_window');
     await handle.cancel();

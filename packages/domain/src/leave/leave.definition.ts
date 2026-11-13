@@ -1,25 +1,16 @@
-import { defineFlow, type FlowDefinition } from '@teopeurt/flowkit-core';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import type { FlowDefinition } from '@teopeurt/flowkit-core';
+import { parseFlowYaml } from '@teopeurt/flowkit-definitions';
 
-export const leaveDefinition: FlowDefinition = defineFlow({
-  id: 'leave-approval-demo', version: 1, roles: ['employee', 'manager'], initialStage: 'employee_draft', initialStatus: 'draft',
-  stages: {
-    employee_draft: { pendingRole: 'employee', steady: true, actions: {
-      submit: { to: 'policy_evaluation', kind: 'human', policy: 'employeeSubmit' },
-      withdraw: { to: 'withdrawn', kind: 'human', policy: 'employeeSubmit' },
-    } },
-    policy_evaluation: { entry: [{ kind: 'system', ref: 'loadLeavePolicyFacts' }, { kind: 'rule', ref: 'routeLeaveRequest' }], actions: {
-      reject_insufficient: { to: 'rejected', kind: 'system', notify: { template: 'leave.rejected', channels: ['inbox', 'email'] } },
-      auto_approve: { to: 'fulfillment', kind: 'system' },
-      require_manager: { to: 'manager_review', kind: 'system', notify: { template: 'leave.manager_review', channels: ['inbox', 'email'] } },
-    } },
-    manager_review: { pendingRole: 'manager', sla: { after: '10s', escalate: { notify: 'manager' } }, actions: {
-      approve: { to: 'fulfillment', kind: 'human', policy: 'managerReview', guards: ['managerTaskClaimed'] },
-      reject: { to: 'rejected', kind: 'human', policy: 'managerReview', guards: ['managerTaskClaimed'], notify: { template: 'leave.rejected', channels: ['inbox', 'email'] } },
-      return: { to: 'employee_draft', kind: 'human', policy: 'managerReview', guards: ['managerTaskClaimed'] },
-    } },
-    fulfillment: { entry: [{ kind: 'system', ref: 'reserveLeaveBalance' }, { kind: 'system', ref: 'createCalendarEntry' }, { kind: 'rule', ref: 'completeFulfillment' }], actions: {
-      complete: { to: 'approved', kind: 'system', notify: { template: 'leave.accepted', channels: ['inbox', 'email'] } },
-    } },
-    approved: { final: true }, rejected: { final: true }, withdrawn: { final: true },
-  },
+/**
+ * The leave flow is authored as YAML (`leave.flow.yaml`). It is parsed once at module load, outside
+ * the Temporal workflow sandbox: the workflow bundle (`../workflow.ts`) never imports this module and
+ * receives the pinned snapshot instead. The parsed definition hashes identically to the equivalent
+ * `defineFlow({...})` object.
+ */
+export const leaveDefinitionPath = fileURLToPath(new URL('./leave.flow.yaml', import.meta.url));
+
+export const leaveDefinition: FlowDefinition = parseFlowYaml(readFileSync(leaveDefinitionPath, 'utf8'), {
+  sourceName: 'leave.flow.yaml',
 });
